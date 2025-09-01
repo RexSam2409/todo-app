@@ -1,7 +1,7 @@
 import {
   Box,
-  Button,
   Card,
+  CardActions,
   CardContent,
   CardHeader,
   Checkbox,
@@ -21,6 +21,7 @@ import { useTaskContext } from "./TaskProvider";
 import EditIcon from "@mui/icons-material/Edit";
 import AddIcon from "@mui/icons-material/Add";
 import CloseIcon from "@mui/icons-material/Close";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 
 const TodoPage = () => {
   const [taskInput, setTaskInput] = useState<string>("");
@@ -39,7 +40,7 @@ const TodoPage = () => {
 
   const handleAdd = () => {
     if (!taskInput.trim()) return;
-    const newId = list.length > 0 ? list[list.length - 1].id + 1 : 0;
+    const newId = list.length > 0 ? list[list.length - 1].id + 1 : 1;
     handleAddTask({ id: newId, value: taskInput, completed: false });
     setTaskInput("");
   };
@@ -48,6 +49,7 @@ const TodoPage = () => {
     setListInput(value);
   };
   const handleEditAdd = () => {
+    console.log("editTaskId", editTaskId);
     if (!editTaskId) return;
     handleEditTask(editTaskId, listInput);
     setEditTaskId(null);
@@ -68,25 +70,51 @@ const TodoPage = () => {
         alignItems: "center",
       }}
     >
-      <Card variant="outlined" sx={{ maxWidth: "800px" }}>
+      <Card variant="outlined" sx={{ maxWidth: "800px" }} elevation={4}>
         <CardContent>
-          <CardHeader title="TO-DO APP" />
+          <CardHeader
+            title="TO-DO APP"
+            sx={{
+              "& .MuiCardHeader-title": {
+                fontWeight: "bold",
+                fontSize: "1.5rem",
+                color: "primary.main",
+              },
+            }}
+          />
           <CardContent>
             <Stack spacing={2}>
-              <Box sx={{ display: "flex", gap: "2rem" }}>
+              <Box
+                sx={{
+                  display: "flex",
+                  gap: "0.5rem",
+                  alignItems: "center",
+                  justifyContent: "center",
+                }}
+              >
                 <TextField
                   type="text"
                   variant="outlined"
                   onChange={handleTextChange}
                   value={taskInput}
+                  size="small"
                 />
-                <Button variant="contained" onClick={handleAdd}>
-                  + Add TO-DO
-                </Button>
+                <IconButton
+                  onClick={handleAdd}
+                  disableFocusRipple
+                  sx={{ color: "primary.main" }}
+                >
+                  <AddCircleIcon fontSize="large" />
+                </IconButton>
               </Box>
               <Divider />
               {list.length > 0 ? (
-                <List>
+                <List
+                  sx={{
+                    maxHeight: "300px",
+                    overflowY: "auto",
+                  }}
+                >
                   {list.map((item) => (
                     <ListItem
                       key={item.id.toString()}
@@ -107,6 +135,8 @@ const TodoPage = () => {
                           value={listInput}
                           onChange={handleListChange}
                           variant="standard"
+                          size="small"
+                          sx={{ width: "150px" }}
                           slotProps={{
                             input: {
                               endAdornment: (
@@ -123,7 +153,14 @@ const TodoPage = () => {
                           }}
                         />
                       ) : (
-                        <ListItemText primary={item.value} />
+                        <ListItemText
+                          primary={item.value}
+                          sx={{
+                            textDecoration: item.completed
+                              ? "line-through"
+                              : "none",
+                          }}
+                        />
                       )}
                       {editTaskId === item.id ? (
                         <IconButton onClick={handleEditAdd}>
@@ -140,10 +177,13 @@ const TodoPage = () => {
                   ))}
                 </List>
               ) : (
-                <Typography variant="h5">No List available</Typography>
+                <Typography variant="subtitle2">No List available</Typography>
               )}
             </Stack>
           </CardContent>
+          <CardActions>
+            <Typography> Total: {list.length}</Typography>
+          </CardActions>
         </CardContent>
       </Card>
     </Box>
